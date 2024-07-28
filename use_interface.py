@@ -9,9 +9,9 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 ds = xr.open_dataset('data.nc').sel(expver=1)
 
 # Function to plot data based on selected year and month
-def plot_data(year, month):
+def plot_data(year, month,var):
     selected_date = f'{year}-{month:02d}-01'
-    data=ds.skt.sel(time=selected_date).values
+    data=ds[var].sel(time=selected_date).values
     plt.figure(figsize=(10, 5))
     img = plt.imshow(data, cmap='coolwarm', vmin=None, vmax=None, aspect='auto')
     plt.title(f'Temperature Distribution for {selected_date}')
@@ -50,12 +50,23 @@ month_to_index = {
     'December': 12
 }
 
+variable_to_index={
+    'Lake Ice Surface Temperature':'lict',
+    'Leaf Area Index, High Vegetation':'lai_hv',
+    'Skin Temperature':'skt',
+    'Snow Density':'rsn',
+    'Snowfall':'sf',
+    'Total Precipitation':'tp'
+}
+
 if tab_selection == 'Plot by Year and Month':
     st.sidebar.header('Select Year and Month')
     year = st.sidebar.selectbox('Select Year', options=list(range(1950, 2024)))
     month = st.sidebar.selectbox('Select Month', options=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])
+    var=st.sidebar.selectbox('Select Variable',options=['Lake Ice Surface Temperature','Leaf Area Index, High Vegetation','Skin Temperature','Snow Density','Snowfall','Total Precipitation'])
     month_index = month_to_index[month]
-    plot_data(year, month_index)
+    var_index=variable_to_index[var]
+    plot_data(year, month_index,var_index)
 
 elif tab_selection == 'Compute Statistics':
     st.sidebar.header('Select Year Range')
